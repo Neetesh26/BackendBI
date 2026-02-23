@@ -1,6 +1,7 @@
 import express from "express"
 import { addProductController, adminLogin, updateProductController,  } from "../controllers/adminAuth.controller"
 import { upload } from "../services/multer.service"
+import { getEnv } from "../shared/utils"
 
 
 const router = express.Router()
@@ -9,9 +10,9 @@ const router = express.Router()
 //     res.send("working admin route")
 // })
 
-router.post('/login',adminLogin)
-router.post('/create-Product',upload.array("images"),addProductController)
-router.put('/product-update/:productId', updateProductController)
+router.post(getEnv("ADMIN_LOGIN"),adminLogin)
+router.post(getEnv("CREATE_PRODUCT_API"),upload.array("images"),addProductController)
+router.put(getEnv("UPDATE_PRODUCT_API"), updateProductController)
 
 
 

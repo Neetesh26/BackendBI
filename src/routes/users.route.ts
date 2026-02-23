@@ -1,98 +1,24 @@
 import express from "express";
 import { 
-  loginUserController, 
-  signupUser, 
-  verifyUserOTPController 
+  
+  sendOTPController, 
+
+  verifyOTPController, 
 } from "../controllers/usersAuth.controller";
+import { getEnv } from "../shared/utils";
 
 const router = express.Router();
 
-/**
- * @swagger
- * tags:
- *   name: Auth
- *   description: Authentication APIs
- */
 
-/**
- * @swagger
- * /auth/signup:
- *   post:
- *     summary: Register user and send OTP
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               phone:
- *                 type: string
- *                 example: "8989071137"
- *     responses:
- *       201:
- *         description: OTP sent successfully
- *       400:
- *         description: Bad request
- */
-router.post("/signup", signupUser);
+// router.post("/signup", signupUser);
+
+// router.post("/verify/:phone", verifyUserOTPController);
 
 
-/**
- * @swagger
- * /auth/verify/{phone}:
- *   post:
- *     summary: Verify OTP using phone number
- *     tags: [Auth]
- *     parameters:
- *       - in: path
- *         name: phone
- *         required: true
- *         schema:
- *           type: string
- *         description: User phone number
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               otp:
- *                 type: string
- *                 example: "123456"
- *     responses:
- *       200:
- *         description: OTP verified successfully
- *       400:
- *         description: Invalid OTP or expired
- */
-router.post("/verify/:phone", verifyUserOTPController);
 
+// router.post("/login", loginUserController);
 
-/**
- * @swagger
- * /auth/login:
- *   post:
- *     summary: Login verified user
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               phone:
- *                 type: string
- *                 example: "8989071137"
- *     responses:
- *       200:
- *         description: Login successful
- *       404:
- *         description: User not found
- */
-router.post("/login", loginUserController);
+router.post(getEnv("SEND_OTP"), sendOTPController);
+router.post(getEnv("VERIFY_OTP"), verifyOTPController);
 
 export default router;
