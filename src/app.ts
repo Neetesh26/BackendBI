@@ -4,7 +4,7 @@ import healthRouter from './routes/health.route'
 import adminRouter from "./routes/admin.route";
 import {swaggerSetup}  from "./config/swagger";
 import { requestLoggerGlobal } from './middleware/requestLogger';
-
+import cors from 'cors';
 
 export const createApp = () => {
   const app = express();
@@ -15,7 +15,8 @@ export const createApp = () => {
   app.use(requestLoggerGlobal)
   swaggerSetup(app);
 
-  
+  //add cors
+  app.use(cors()); 
   app.use('/api/v1/health',healthRouter)
 
   app.use('/api/v1/auth', authRouter)

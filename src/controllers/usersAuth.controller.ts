@@ -2,6 +2,7 @@ import asyncWrapper from "../middleware/asyncWrapper";
 import { Request, Response } from "express";
 import { sendOTPService, verifyOTPService } from "../services/auth.service";
 import { HttpStatus } from "../constants";
+import { log } from "console";
 
 // export const signupUser = asyncWrapper(async (req: Request, res: Response) => {
 //   const { phone } = req.body as { phone: string };
@@ -62,7 +63,7 @@ export const sendOTPController = asyncWrapper(
 export const verifyOTPController = asyncWrapper(
   async (req: Request, res: Response) => {
     const { phone, otp } = req.body;
-
+    log("phone, otp-->",phone, otp);
     const data = await verifyOTPService(phone, otp);
 
     return res.status(HttpStatus.OK).json({

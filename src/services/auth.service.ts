@@ -64,27 +64,30 @@ export const sendOTPService = async (phone: string) => {
   logger.info(`OTP request for phone: ${phone}`);
 
   let user = await findByCondition({ phone });
+// console.log(user);
 
-  const otp = generateOTP();
-  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+const otp = generateOTP();
+const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
 
-  const successfullySendOtp = await twilioService.sendOTP(phone, otp);
+const successfullySendOtp = await twilioService.sendOTP(phone, otp);
 
-  if (!successfullySendOtp) {
-    throw new errorIndex.BadRequestException(
-      HttpMessage.BAD_REQUEST,
-      HttpStatus.BAD_REQUEST
-    );
-  }
+if (!successfullySendOtp) {
+  throw new errorIndex.BadRequestException(
+    HttpMessage.BAD_REQUEST,
+    HttpStatus.BAD_REQUEST
+  );
+}
 
-  if (!user) {
-    user = await createUser({
-      phone,
-      otp,
-      otpExpiry,
-      isverified: false,
-    });
-
+if (!user) {
+  user = await createUser({
+    phone,
+    otp,
+    otpExpiry,
+    isverified: false,
+  });
+  
+  // console.log(otp);
+  // console.log(user);
     return { message: "User created. OTP sent." };
   }
 
@@ -94,7 +97,7 @@ export const sendOTPService = async (phone: string) => {
 
   await user.save();
 
-  return { message: HttpMessage.CREATED };
+  return { message: HttpMessage.CREATED ,user};
 };
 
 
@@ -144,8 +147,12 @@ export const verifyOTPService = async (
   phone: string,
   enteredOTP: string
 ) => {
+  console.log("enterd otp",typeof enteredOTP);
+  
   const user = await findByCondition({ phone });
-
+  console.log("user->",user);
+  console.log("user->",user?.otp, typeof user?.otp);
+  
   if (!user) {
     throw new errorIndex.NotFoundHandler(
       HttpMessage.NOT_FOUND,
