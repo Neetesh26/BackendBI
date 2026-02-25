@@ -21,6 +21,7 @@
     "imagekit": "^6.0.0",
     "mongoose": "^7.5.0",
     "multer": "^2.0.2",
+    "stripe": "^20.3.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "twilio": "^5.12.1"

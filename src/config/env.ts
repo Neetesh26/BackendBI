@@ -10,7 +10,7 @@ const isEmptyString = (value: unknown): boolean =>
 const isEmpty = (value: unknown): boolean =>
     isNull(value) || isUndefined(value) || isEmptyString(value);
 
-const getEnv = (key: string): string => {
+export const getEnv = (key: string): string => {
     const value = process.env[key];
     if (isEmpty(value)) {
         throw new Error(` Database environment variable "${key}" is not defined`);
