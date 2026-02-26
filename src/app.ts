@@ -9,9 +9,12 @@ import cors from 'cors';
 
 export const createApp = () => {
   const app = express();
+  // stripe requires the raw body for webhook signature verification; register
+  // the middleware for that path before the generic json parser.
+  app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-
 
   app.use(requestLoggerGlobal)
   swaggerSetup(app);

@@ -147,11 +147,11 @@ export const verifyOTPService = async (
   phone: string,
   enteredOTP: string
 ) => {
-  console.log("enterd otp",typeof enteredOTP);
+  // console.log("enterd otp",typeof enteredOTP);
   
   const user = await findByCondition({ phone });
-  console.log("user->",user);
-  console.log("user->",user?.otp, typeof user?.otp);
+  // console.log("user->",user);
+  // console.log("user->",user?.otp, typeof user?.otp);
   
   if (!user) {
     throw new errorIndex.NotFoundHandler(

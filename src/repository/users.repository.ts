@@ -5,7 +5,8 @@ export const createUser = async (data: any) => {
 };
 
 export const findByCondition = async (obj: Record<string, string | number>) => {
-
+  // console.log("obje isss--->",obj);
+  
   return await usersSchema.findOne(obj);
 };
 

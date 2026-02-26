@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
-// import stripe from "../config/stripeInstance";
-import { paymentServices } from "../services/paymentGateway.service";
+import {
+  createCheckoutSession as createSessionService,
+  createPaymentIntent as createIntentService,
+  // handleStripeWebhook
+} from "../services/paymentGateway.service";
 import { HttpMessage } from "../constants";
 
 interface ProductItem {
@@ -12,6 +15,8 @@ interface ProductItem {
 
 interface CheckoutBody {
   product: ProductItem[];
+  userData?: any;
+  paymentMethodId?: string;
 }
 
 export const createCheckoutSession = async (
@@ -19,12 +24,10 @@ export const createCheckoutSession = async (
   res: Response
 ) => {
   try {
-    // console.log("BODY:", req.body);
+    const { product, userData } = req.body;
+    // console.log(req.body);
 
-    const { product } = req.body;
-
-    const session = await paymentServices(product);
-
+    const session = await createSessionService(product, userData);
     return res.json({ url: session.url });
   } catch (error) {
     return res.status(500).json({
@@ -33,3 +36,49 @@ export const createCheckoutSession = async (
     });
   }
 };
+
+// new endpoint used by the frontend when implementing the PaymentIntent flow
+export const createPaymentIntent = async (
+  req: Request<{}, {}, CheckoutBody>,
+  res: Response
+) => {
+  // console.log(">>>>>>>>>r3q.vody",req.body);
+  // console.log(">>>>>>>>>r3q.vody",req.body);
+  
+  try {
+    const { product, userData } = req.body;
+
+    // console.log(">>>>>>>", product)
+    // console.log(">>>>>>>",  userData)
+    const result = await createIntentService(product, userData);
+    // console.log(">>>>>>>successfullafter services", result)
+
+    if (result && !result.intent) {
+      return res.json({ customerId: result.customerId });
+    }
+
+    const { intent, customerId } = result as any;
+    return res.json({ clientSecret: intent.client_secret, customerId });
+  } catch (error) {
+    return res.status(500).json({
+      error:  
+        error instanceof Error ? error.message : HttpMessage.INTERNAL_SERVER_ERROR,
+    });
+  }
+};
+
+// stripe will POST raw json to this route; middleware must use express.raw
+// export const stripeWebhook = async (
+//   req: Request,
+//   res: Response
+// ) => {
+//   const signature = req.headers["stripe-signature"] as string;
+//   try {
+//     await handleStripeWebhook(signature, req.body as Buffer);
+//     return res.status(200).send("ok");
+//   } catch (error) {
+//     const message = error instanceof Error ? error.message : "unknown";
+    console.error("webhook error", message);
+//     return res.status(400).send(`Webhook Error: ${message}`);
+//   }
+// };

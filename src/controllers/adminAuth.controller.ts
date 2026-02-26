@@ -29,7 +29,7 @@ export const addProductController = asyncWrapper(
         uploadToImageKit(file.buffer, file.originalname)
       )
     );
-    console.log(" req body product--->",req.body);
+    // console.log(" req body product--->",req.body);
     
     const product = await createProducts({
       productName: req.body.productName,

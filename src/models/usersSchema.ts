@@ -26,6 +26,9 @@ const userSchema = new mongoose.Schema({
   },
   stripeCustomerId:{
     type: String,
+  },
+  stripePaymentMethodId: {
+    type: String,
   }
 });
 
