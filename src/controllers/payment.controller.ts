@@ -78,7 +78,7 @@ export const createPaymentIntent = async (
 //     return res.status(200).send("ok");
 //   } catch (error) {
 //     const message = error instanceof Error ? error.message : "unknown";
-    console.error("webhook error", message);
+    // console.error("webhook error", message);
 //     return res.status(400).send(`Webhook Error: ${message}`);
 //   }
 // };
