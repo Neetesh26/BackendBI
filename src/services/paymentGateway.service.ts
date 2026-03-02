@@ -1,6 +1,7 @@
 // import { getEnv } from "../config/env";
 import { stripe } from "../config/stripeInstance";
 import { HttpMessage } from "../constants";
+import { Card } from "../models/CardSchema";
 import { findByCondition, updateById } from "../repository/users.repository";
 
 
@@ -89,8 +90,6 @@ export const createPaymentIntent = async (
   userData: any,
   paymentMethodId?: string
 ) => {
-  // console.log("inside services intent" , userData, product);
-  
   if (!product || !Array.isArray(product) || product.length === 0) {
     throw new Error(HttpMessage.NOT_FOUND);
   }
@@ -98,11 +97,11 @@ export const createPaymentIntent = async (
   const amount = computeAmount(product);
   const customerId = await resolveStripeCustomer(userData);
 
-  
   if (!customerId) {
     throw new Error("Stripe customer not found or could not be created");
   }
 
+  // If first step → just return customerId
   if (!paymentMethodId) {
     return { customerId };
   }
@@ -121,10 +120,23 @@ export const createPaymentIntent = async (
     invoice_settings: { default_payment_method: paymentMethodId },
   });
 
-  if (userData?._id) {
-    await updateById(userData._id, {
-      stripePaymentMethodId: paymentMethodId,
-    });
+  const paymentMethod = await stripe.paymentMethods.retrieve(
+    paymentMethodId
+  );
+
+  if (paymentMethod.card && userData?._id) {
+    await Card.findOneAndUpdate(
+      { userId: userData._id },
+      {
+        userId: userData._id,
+        stripePaymentMethodId: paymentMethodId,
+        brand: paymentMethod.card.brand,
+        last4: paymentMethod.card.last4,
+        expMonth: paymentMethod.card.exp_month,
+        expYear: paymentMethod.card.exp_year,
+      },
+      { upsert: true, new: true }
+    );
   }
 
   const intent = await stripe.paymentIntents.create({
@@ -138,8 +150,7 @@ export const createPaymentIntent = async (
     },
     payment_method_types: ["card"],
   });
-  console.log(">>>>>>>intent",intent);
-  
+
   return { intent, customerId };
 };
 

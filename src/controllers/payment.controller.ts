@@ -19,7 +19,7 @@ import { HttpMessage } from "../constants";
 //   paymentMethodId?: string;
 // }
 
-export const createPaymentIntent = async (
+export const  createPaymentIntent = async (
   req: Request<{}, {}>,
   res: Response
 ): Promise<Response> => {
