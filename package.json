@@ -20,6 +20,7 @@
     "express": "^4.18.2",
     "imagekit": "^6.0.0",
     "ioredis": "^5.10.0",
+    "mongodb": "^7.1.0",
     "mongoose": "^7.5.0",
     "multer": "^2.0.2",
     "redis": "^5.11.0",
