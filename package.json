@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/server.js",
-  "scripts": {
-    "dev": "ts-node src/server.ts",
-    "build": "tsc",
-    "start": "nodemon dist/server.js",
-    "watch": "tsc --watch"
-  },
+ "scripts": {
+  "dev": "ts-node src/server.ts",
+  "build": "tsc",
+  "start": "node dist/server.js"
+},
   "author": "",
   "license": "ISC",
   "dependencies": {
