@@ -6,6 +6,7 @@ import {swaggerSetup}  from "./config/swagger";
 import { requestLoggerGlobal } from './middleware/requestLogger';
 import paymentRoute from "./routes/payment.route";
 import cors from 'cors';
+import { tokenBucketLimiter } from './middleware/tokenBucketRatelimiter';
 
 export const createApp = () => {
   const app = express();
@@ -24,6 +25,10 @@ export const createApp = () => {
     methods: ['GET', 'POST', 'PUT', 'DELETE'], 
     allowedHeaders: ['Content-Type', 'Authorization'], 
   })); 
+
+
+  app.use(tokenBucketLimiter(10,1)); // 10 tokens max, refills at 1 token/sec 
+
   app.use('/api/v1/health',healthRouter)
 
   app.use('/api/v1/auth', authRouter)
