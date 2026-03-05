@@ -1,35 +1,42 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  phone: {
+  email: {
     type: String,
     required: true,
     unique: true,
   },
-  isverified:{
+
+  isverified: {
     type: Boolean,
     default: false,
   },
-  token:{
+
+  token: {
     type: String,
   },
+
   otp: {
     type: String,
   },
+
   otpExpiry: {
     type: Date,
   },
+
   role: {
     type: String,
     enum: ["user", "admin"],
-    default: "user"
+    default: "user",
   },
-  stripeCustomerId:{
+
+  stripeCustomerId: {
     type: String,
   },
+
   stripePaymentMethodId: {
     type: String,
-  }
+  },
 });
 
 export default mongoose.model("User", userSchema);

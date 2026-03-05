@@ -13,6 +13,7 @@
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
+    "@types/nodemailer": "^7.0.11",
     "@types/winston": "^2.4.4",
     "cors": "^2.8.6",
     "dotenv": "^16.3.1",
@@ -24,6 +25,7 @@
     "mongodb": "^7.1.0",
     "mongoose": "^7.5.0",
     "multer": "^2.0.2",
+    "nodemailer": "^8.0.1",
     "redis": "^5.11.0",
     "stripe": "^20.3.1",
     "swagger-jsdoc": "^6.2.8",

@@ -1,38 +1,28 @@
 import { HttpMessage, HttpStatus } from "../constants";
 import { errorIndex } from "../errors/errorIndex";
 import { generateOTP, generateToken } from "../shared/helper";
-import twilioService from "./twillio.service";
+import emailService from "./email.service";
 import { getEnv } from "../shared/utils";
 import { createUser, findByCondition } from "../repository/users.repository";
 import logger from "../config/logger";
 
+export const sendOTPService = async (email: string) => {
+  logger.info(`OTP request for email: ${email}`);
 
+  let user = await findByCondition({ email });
 
-export const sendOTPService = async (phone: string) => {
-  logger.info(`OTP request for phone: ${phone}`);
+  const otp = generateOTP();
+  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
 
-  let user = await findByCondition({ phone });
+  await emailService.sendOTPEmail(email, otp);
 
-const otp = generateOTP();
-const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
-
-const successfullySendOtp = await twilioService.sendOTP(phone, otp);
-
-if (!successfullySendOtp) {
-  throw new errorIndex.BadRequestException(
-    HttpMessage.BAD_REQUEST,
-    HttpStatus.BAD_REQUEST
-  );
-}
-
-if (!user) {
-  user = await createUser({
-    phone,
-    otp,
-    otpExpiry,
-    isverified: false,
-  });
-  
+  if (!user) {
+    user = await createUser({
+      email,
+      otp,
+      otpExpiry,
+      isverified: false,
+    });
 
     return { message: "User created. OTP sent." };
   }
@@ -43,20 +33,15 @@ if (!user) {
 
   await user.save();
 
-  return { message: HttpMessage.CREATED ,user};
+  return { message: "OTP Sent Successfully", user };
 };
 
-
 export const verifyOTPService = async (
-  phone: string,
+  email: string,
   enteredOTP: string
 ) => {
-  // console.log("enterd otp",typeof enteredOTP);
-  
-  const user = await findByCondition({ phone });
-  // console.log("user->",user);
-  // console.log("user->",user?.otp, typeof user?.otp);
-  
+  const user = await findByCondition({ email });
+
   if (!user) {
     throw new errorIndex.NotFoundHandler(
       HttpMessage.NOT_FOUND,
@@ -66,7 +51,7 @@ export const verifyOTPService = async (
 
   if (user.otp !== enteredOTP) {
     throw new errorIndex.BadRequestException(
-      "Invalid OTP",
+      HttpMessage.NOT_FOUND ,
       HttpStatus.BAD_REQUEST
     );
   }
@@ -83,50 +68,12 @@ export const verifyOTPService = async (
   user.otpExpiry = undefined;
 
   const token = generateToken(
-    { id: user._id, phone: user.phone },
+    { id: user._id, email: user.email },
     getEnv("JWT_SECRET")
   );
 
   user.token = token;
   await user.save();
-
-  return { user, token };
-};
-
-
-
-export const loginUser = async (phone: string) => {
-  logger.info(`Login attempt for phone: ${phone}`);
-
-  const user = await findByCondition({ phone });
-
-  if (!user) {
-    logger.warn(`Login failed - user not found: ${phone}`);
-
-    throw new errorIndex.NotFoundHandler(
-      HttpMessage.NOT_FOUND,
-      HttpStatus.NOT_FOUND
-    );
-  }
-
-  if (!user.isverified) {
-    logger.warn(`Login blocked - user not verified: ${phone}`);
-
-    throw new errorIndex.BadRequestException(
-      "User not verified",
-      HttpStatus.BAD_REQUEST
-    );   
-  }
-
-  const token = generateToken(
-    { phone: user.phone, id: user._id },
-    getEnv("JWT_SECRET")
-  );
-
-  user.token = token;
-  await user.save();
-
-  logger.info(`User logged in successfully: ${phone}`);
 
   return { user, token };
 };
