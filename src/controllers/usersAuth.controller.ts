@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import { sendOTPService, verifyOTPService } from "../services/auth.service";
 import { HttpStatus } from "../constants";
 import { generateToken } from "../shared/helper";
+import { getEnv } from "../config/env";
   // import { generateToken } from "../shared/helper";
   // import { getEnv } from "../config/env";
 
@@ -42,7 +43,7 @@ export const googleAuthCallback = (req: Request, res: Response, next: any) => {
   passport.authenticate("google", { session: false }, (err, user) => {
     if (err || !user) {
       // Failed login → redirect to frontend login page
-      return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/login`);
+      return res.redirect(`${getEnv("FRONTEND_URL")}/login`);
     }
 
     // Successful login → generate JWT token
@@ -50,7 +51,7 @@ export const googleAuthCallback = (req: Request, res: Response, next: any) => {
 
     // Redirect to frontend with token in query params
     return res.redirect(
-  `${process.env.FRONTEND_URL || "http://localhost:5173"}/oAuth-success?email=${user.email}&id=${user._id}&token=${token}`
+  `${getEnv("FRONTEND_URL")}/oAuth-success?email=${user.email}&id=${user._id}&token=${token}`
 );
   })(req, res, next);
 };
