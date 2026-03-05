@@ -1,5 +1,7 @@
 import nodemailer from "nodemailer";
 import { getEnv } from "../config/env";
+import dns from "dns";
+dns.setDefaultResultOrder("ipv4first");
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
