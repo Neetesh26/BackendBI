@@ -7,6 +7,8 @@ import { requestLoggerGlobal } from './middleware/requestLogger';
 import paymentRoute from "./routes/payment.route";
 import cors from 'cors';
 
+import passport from "./config/passport";
+import googleRouter from "./routes/users.route"; 
 export const createApp = () => {
   const app = express();
   // stripe requires the raw body for webhook signature verification; register
@@ -26,6 +28,9 @@ export const createApp = () => {
   }));
 
 
+app.use(passport.initialize());
+// New Google OAuth routes
+app.use("/api/v1/auth", googleRouter);
   // app.set("trust proxy", true);
   app.use('/api/v1/health', healthRouter)
 

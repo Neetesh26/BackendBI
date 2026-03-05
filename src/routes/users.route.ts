@@ -1,6 +1,8 @@
 import express from "express";
 import { 
   
+  googleAuth,
+  googleAuthCallback,
   sendOTPController, 
 
   verifyOTPController, 
@@ -21,5 +23,9 @@ const router = express.Router();
 
 router.post(getEnv("SEND_OTP"), sendOTPController);
 router.post(getEnv("VERIFY_OTP"),globalLimiter, verifyOTPController);
+
+
+router.get("/google", googleAuth);
+router.get("/google/callback", googleAuthCallback);
 
 export default router;

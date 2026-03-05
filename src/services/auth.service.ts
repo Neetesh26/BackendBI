@@ -36,41 +36,26 @@ export const sendOTPService = async (email: string) => {
   return { message: "OTP Sent Successfully", user };
 };
 
-export const verifyOTPService = async (
-  email: string,
-  enteredOTP: string
-) => {
+export const verifyOTPService = async (email: string, enteredOTP: string) => {
   const user = await findByCondition({ email });
 
   if (!user) {
-    throw new errorIndex.NotFoundHandler(
-      HttpMessage.NOT_FOUND,
-      HttpStatus.NOT_FOUND
-    );
+    throw new errorIndex.NotFoundHandler(HttpMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
   }
 
   if (user.otp !== enteredOTP) {
-    throw new errorIndex.BadRequestException(
-      HttpMessage.NOT_FOUND ,
-      HttpStatus.BAD_REQUEST
-    );
+    throw new errorIndex.BadRequestException(HttpMessage.NOT_FOUND, HttpStatus.BAD_REQUEST);
   }
 
   if (!user.otpExpiry || user.otpExpiry < new Date()) {
-    throw new errorIndex.BadRequestException(
-      "OTP expired",
-      HttpStatus.BAD_REQUEST
-    );
+    throw new errorIndex.BadRequestException("OTP expired", HttpStatus.BAD_REQUEST);
   }
 
   user.isverified = true;
   user.otp = undefined;
   user.otpExpiry = undefined;
 
-  const token = generateToken(
-    { id: user._id, email: user.email },
-    getEnv("JWT_SECRET")
-  );
+  const token = generateToken({ id: user._id, email: user.email }, getEnv("JWT_SECRET"));
 
   user.token = token;
   await user.save();
