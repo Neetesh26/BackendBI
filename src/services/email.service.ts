@@ -82,9 +82,12 @@
 // export default { sendOTPEmail };
 
 
-
 import nodemailer from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
+import dns from "dns";
 import { getEnv } from "../config/env";
+
+dns.setDefaultResultOrder("ipv4first");
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -95,27 +98,27 @@ const transporter = nodemailer.createTransport({
     pass: getEnv("MAIL_PASS"),
   },
   tls: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false,
   },
-  connectionTimeout: 10000,
-  greetingTimeout: 5000,
-  socketTimeout: 10000
-});
+  connectionTimeout: 20000,
+  greetingTimeout: 10000,
+  socketTimeout: 20000,
+} as SMTPTransport.Options);
 
-// verify connection (helps debugging on deployment)
-transporter.verify((error, _success) => {
+// Verify SMTP connection
+transporter.verify((error, success) => {
   if (error) {
     console.error("SMTP Connection Error:", error);
   } else {
-    console.log("SMTP Server Ready");
+    console.log("SMTP Server Ready:", success);
   }
 });
 
-const sendOTPEmail = async (email: string, otp: string) => {
+const sendOTPEmail = async (email: string, otp: string): Promise<boolean> => {
   try {
     console.log("Sending OTP email...");
 
-    const mailOptions = {
+    const info = await transporter.sendMail({
       from: `"Auth Service" <${getEnv("MAIL_USER")}>`,
       to: email,
       subject: "Your OTP Code",
@@ -125,9 +128,7 @@ const sendOTPEmail = async (email: string, otp: string) => {
         <h1>${otp}</h1>
         <p>This OTP will expire in 5 minutes.</p>
       `,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
+    });
 
     console.log("Email sent:", info.messageId);
     return true;
