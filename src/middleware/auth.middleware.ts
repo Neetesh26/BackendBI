@@ -26,11 +26,12 @@ export const verifyToken = async (
 
     const token = authHeader.split(" ")[1];
 
-    jwt.verify(
+    const userFind = jwt.verify(
       token,
       process.env.JWT_SECRET as string
     ) as JwtPayload;
-
+    console.log(">>>>>user verify",userFind);
+    
     const user = await User.findOne({ token });
 
     if (!user) {
