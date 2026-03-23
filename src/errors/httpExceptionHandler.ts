@@ -9,8 +9,8 @@ class HttpException extends Error {
         super(message);
         this.name = message || HttpMessage.INTERNAL_SERVER_ERROR;
         this.statusCode = statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
-        Error.captureStackTrace(this, this.constructor);    
+        Error.captureStackTrace(this, this.constructor);
     }
-} 
+}
 
 export default HttpException;

@@ -5,6 +5,7 @@ import authRouter from './routes/users.route';
 import healthRouter from './routes/health.route'
 import adminRouter from "./routes/admin.route";
 import paymentRoute from "./routes/payment.route";
+
 import cors from 'cors';
 import compression from "compression";
 

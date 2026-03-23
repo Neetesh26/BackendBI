@@ -27,6 +27,15 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "paid", "shipped", "delivered"],
       default: "pending",
     },
+    trackingNumber: {
+      type: String,
+      // default: null
+    },
+    trackingUrl: {
+      type: String,
+      // default: null
+    },
+    
   },
   { timestamps: true }
 );

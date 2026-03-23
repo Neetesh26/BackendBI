@@ -1,10 +1,9 @@
 import Order from "../models/order.model";
 import User from "../models/usersSchema";
 import { sendOrderMail } from "./sendOrderMail.service";
+import { createShipmentService } from "./shipment.service";
 
 export const createOrderService = async (orderData: any) => {
-
-  // console.log(">>>>>>>ordersdata", orderData);
 
   const { userId, products, paymentId, status } = orderData;
 
@@ -22,27 +21,41 @@ export const createOrderService = async (orderData: any) => {
     status
   });
 
-  // console.log("orders---->", order);
-
+  // SEND EMAIL
   try {
 
     const user = await User.findById(userId);
 
     if (user?.email) {
-
       await sendOrderMail(
         user.email,
         order._id.toString(),
         formattedProducts
       );
-
-      console.log("Order email sent");
-
     }
 
   } catch (mailError) {
 
     console.error("Email failed but order created:", mailError);
+
+  }
+
+  // CREATE SHIPMENT
+  try {
+
+    const shipment = await createShipmentService();
+    console.log(">>>>>>>",shipment);
+    
+
+    const trackingNumber = shipment.objectId;
+
+    order.trackingNumber = trackingNumber;
+
+    await order.save();
+
+  } catch (shipmentError) {
+
+    console.error("Shipment failed but order created:", shipmentError);
 
   }
 

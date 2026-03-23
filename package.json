@@ -31,6 +31,7 @@
     "passport-google-oauth20": "^2.0.0",
     "redis": "^5.11.0",
     "resend": "^6.9.3",
+    "shippo": "^2.18.0",
     "stripe": "^20.3.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
