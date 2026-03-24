@@ -14,13 +14,14 @@ import passport from "./config/passport";
 import googleRouter from "./routes/users.route";
 import orderRoutes from "./routes/order.routes";
 import profileRoutes from "./routes/profile.routes";
-
+// import aiRoutes  from './routes/ai.routes'
+import chatRoutes from "./routes/chat.route";
 
 export const createApp = () => {
   const app = express();
   // stripe requires the raw body for webhook signature verification; register
   // the middleware for that path before the generic json parser.
-  app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
+  // app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -50,6 +51,7 @@ export const createApp = () => {
   app.use("/api/payment", paymentRoute);
   app.use("/api/orders", orderRoutes);
 
+  app.use("/api", chatRoutes);
 
 
   app.use("/api/v1/profile", profileRoutes);
