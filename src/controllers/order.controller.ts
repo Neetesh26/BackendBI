@@ -16,7 +16,7 @@ export const createOrderController = async (req: Request, res: Response) => {
       order,
     });
   } catch (error) {
-    console.error(">>>>>>>>controllererr",error);
+    // console.error(">>>>>>>>controllererr",error);
 
     res.status(500).json({
       success: false,
@@ -30,7 +30,6 @@ export const getUserOrdersController = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     const orders = await getOrdersByUserService(userId);
-    console.log();
     
     res.json({
       success: true,

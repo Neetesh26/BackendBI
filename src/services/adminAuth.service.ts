@@ -105,13 +105,11 @@ export const updateOrderStatusService = async (
     );
   }
 
-  // update status
   order.status = status;
 
   await order.save();
 
  try {
-   // send email notification
   const userEmail = (order.userId as any).email;
 
   if (userEmail) {

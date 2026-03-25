@@ -13,7 +13,6 @@ export const chatHandler = async (req: Request, res: Response) => {
 
     const lowerMsg = message.toLowerCase();
 
-    // 💰 Budget filter
     if (lowerMsg.includes("under") || lowerMsg.includes("budget")) {
       const match = message.match(/\d+/);
       const budget = parseInt(match?.[0] || "0");
