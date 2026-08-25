@@ -19,7 +19,7 @@ export const getEnv = (key: string): string => {
 };
 
 export const DatabaseConfig = {
-    MONGO_URI: getEnv('MONGO_URI'),
+    MONGO_URI: process.env.MONGO_URI || 'mongodb://root:secret@127.0.0.1:27017/ecom?authSource=admin',
 };
 
 export default DatabaseConfig;

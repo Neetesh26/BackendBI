@@ -93,9 +93,21 @@ export const createPaymentIntent = async (
     },
   });
 
-  const paymentMethod = await stripe.paymentMethods.retrieve(
-    paymentMethodId
-  );
+  // Optimize: Run card retrieval and payment intent creation concurrently
+  const [paymentMethod, intent] = await Promise.all([
+    stripe.paymentMethods.retrieve(paymentMethodId),
+    stripe.paymentIntents.create({
+      amount,
+      currency: "inr",
+      customer: customerId,
+      payment_method: paymentMethodId,
+      metadata: {
+        userId: userData?._id || "",
+        products: JSON.stringify(product),
+      },
+      payment_method_types: ["card"],
+    })
+  ]);
 
   // Save card reference
   if (paymentMethod.card && userData?._id) {
@@ -113,18 +125,6 @@ export const createPaymentIntent = async (
     );
 
   }
-
-  const intent = await stripe.paymentIntents.create({
-    amount,
-    currency: "inr",
-    customer: customerId,
-    payment_method: paymentMethodId,
-    metadata: {
-      userId: userData?._id || "",
-      products: JSON.stringify(product),
-    },
-    payment_method_types: ["card"],
-  });
 
   return {
     intent,

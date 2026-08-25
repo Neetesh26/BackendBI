@@ -21,43 +21,35 @@ export const createOrderService = async (orderData: any) => {
     status
   });
 
-  // SEND EMAIL
-  try {
+  // SEND EMAIL in background
+  User.findById(userId)
+    .then((user) => {
+      if (user?.email) {
+        sendOrderMail(
+          user.email,
+          order._id.toString(),
+          formattedProducts
+        ).catch((mailError) =>
+          console.error("Email failed in background:", mailError)
+        );
+      }
+    })
+    .catch((err) =>
+      console.error("Failed to find user for email in background:", err)
+    );
 
-    const user = await User.findById(userId);
-
-    if (user?.email) {
-      await sendOrderMail(
-        user.email,
-        order._id.toString(),
-        formattedProducts
-      );
-    }
-
-  } catch (mailError) {
-
-    console.error("Email failed but order created:", mailError);
-
-  }
-
-  // CREATE SHIPMENT
-  try {
-
-    const shipment = await createShipmentService();
-    console.log(">>>>>>>",shipment);
-    
-
-    const trackingNumber = shipment.objectId;
-
-    order.trackingNumber = trackingNumber;
-
-    await order.save();
-
-  } catch (shipmentError) {
-
-    console.error("Shipment failed but order created:", shipmentError);
-
-  }
+  // CREATE SHIPMENT in background
+  createShipmentService()
+    .then(async (shipment) => {
+      if (shipment && shipment.objectId) {
+        const trackingNumber = shipment.objectId;
+        await Order.findByIdAndUpdate(order._id, { trackingNumber });
+        console.log(`Shipment created and order updated for order ID: ${order._id}`);
+      }
+    })
+    .catch((shipmentError) => {
+      console.error("Background shipment creation failed:", shipmentError);
+    });
 
   return order;
 };

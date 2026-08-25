@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   googleId: {
-    type:String
+    type: String,
+    index: true,
   },
 
   isverified: {
@@ -35,6 +36,7 @@ const userSchema = new mongoose.Schema({
 
   stripeCustomerId: {
     type: String,
+    index: true,
   },
 
   stripePaymentMethodId: {

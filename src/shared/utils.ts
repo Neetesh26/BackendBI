@@ -54,6 +54,6 @@ export const getNumberEnv = (key: string): number => {
 export const AppConfig = {
     NODE_ENV: getEnv('NODE_ENV') as EnvironmentType,
     PORT: getNumberEnv('PORT'),
-    MONGO_URI: getEnv('MONGO_URI'),
+    MONGO_URI: process.env.MONGO_URI || 'mongodb://root:secret@127.0.0.1:27017/ecom?authSource=admin',
     JWT_SECRET: getEnv('JWT_SECRET'),
 };

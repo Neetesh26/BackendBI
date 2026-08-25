@@ -4,7 +4,7 @@ const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
-    price: { type: Number, required: true },
+    price: { type: Number, required: true, index: true },
 
     image: [{ type: String }],
 
@@ -12,6 +12,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       enum: ["Men", "Women", "Kids", "Shoes"],
       required: true,
+      index: true,
     },
 
     subCategory: {

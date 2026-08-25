@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { generateGroqResponse, ChatMessage } from "../services/aiChatBot/grok.service";
 import { ProductModel } from "../models/productSchema";
 import OrderModel from "../models/order.model";
+import redis from "../services/redisIo.service";
 
 export const chatHandler = async (req: Request, res: Response) => {
   try {
@@ -89,10 +90,25 @@ export const chatHandler = async (req: Request, res: Response) => {
     }
 
     // 🤖 Groq AI fallback — with history
-    const products = await ProductModel.find()
-      .select("name price category")
-      .limit(15)
-      .lean();
+    let products: any[] = [];
+    try {
+      const cachedProducts = await redis.get("chatbot_product_context");
+      if (cachedProducts) {
+        products = JSON.parse(cachedProducts);
+      } else {
+        products = await ProductModel.find()
+          .select("name price category")
+          .limit(15)
+          .lean();
+        await redis.set("chatbot_product_context", JSON.stringify(products), "EX", 3600);
+      }
+    } catch (redisError) {
+      console.warn("Redis chatbot cache error, falling back to DB:", redisError);
+      products = await ProductModel.find()
+        .select("name price category")
+        .limit(15)
+        .lean();
+    }
 
     const aiReply = await generateGroqResponse(message, products, history);
 

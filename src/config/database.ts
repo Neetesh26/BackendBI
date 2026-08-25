@@ -3,22 +3,43 @@ import { DatabaseConfig } from "./env";
 
 let connection: Connection | null = null;
 
+const buildMongoUris = (): string[] => {
+  const configuredUri = DatabaseConfig.MONGO_URI?.trim();
+
+  const candidates = [
+    "mongodb://127.0.0.1:27017/ecom",
+    configuredUri,
+  ].filter((uri): uri is string => Boolean(uri));
+
+  return [...new Set(candidates)];
+};
+
 export const connectDB = async (): Promise<Connection> => {
-  try {
-    await mongoose.connect(DatabaseConfig.MONGO_URI);
+  const mongoUris = buildMongoUris();
+  let lastError: unknown;
 
-    connection = mongoose.connection;
+  for (const uri of mongoUris) {
+    try {
+      await mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 5000,
+      });
 
-    console.log("MongoDB connected successfully");
-    console.log("MongoDB connected with : ", connection.host);
+      connection = mongoose.connection;
 
-    connection.on("error", (err) => {
-      console.error(" MongoDB connection error:", err);
-    });
+      console.log("MongoDB connected successfully");
+      console.log("MongoDB connected with:", connection.host);
 
-    return connection;
-  } catch (error) {
-    console.error(" MongoDB connection failed:", error);
-    process.exit(1);
+      connection.on("error", (err) => {
+        console.error("MongoDB connection error:", err);
+      });
+
+      return connection;
+    } catch (error) {
+      lastError = error;
+      console.warn(`MongoDB connection failed for ${uri}:`, error);
+    }
   }
+
+  console.error("MongoDB connection failed:", lastError);
+  process.exit(1);
 };
